@@ -11,63 +11,51 @@ def compress(data, compressed_file):
     table_ranges = {}
     for key, value in sorted_freq.items():
         high = low + value
-        table_ranges[key] = high
+        table_ranges[key] = (low, high)
         low = high
     
     # Создание вложенных интервалов для каждого символа
     intervals = {}
     low = 0
-    high = 2**32
+    high = 65_535
     low_last = 0
-    high_last = 2**32
+    high_last = 65_535
     bits_F = 0
     
     qtr_1 = int((high_last + 1) / 4)
     half = qtr_1 * 2
     qtr_3 = qtr_1 * 3
     bits_to_write = []
-    delitel = list(table_ranges.values())[-1]
+    delitel = list(table_ranges.values())[-1][1]
+    print(delitel)
     
     for symbol in data:
-        low = low_last + intervals[symbol][0] * (high_last - low_last + 1) / delitel
-    '''
-
-    delit = intervals[last_key][1]
-    print(intervals)
-    print(intervals['.'][0])
-    s = []
-    for symbol in data:
-        if symbol not in s:
-            s.append(symbol)
-            low = int(low_last + intervals[symbol][0] * (high_last - low_last + 1) / delit)
-            high = int(low_last + intervals[symbol][1] * (high_last - low_last + 1) / delit - 1)
-            print()
-            print(low)
-            print(high)
-            while True:
-                if high < half:
-                    print("0")
-                elif low >= half:
-                    print("1")
-                    low -= half
-                    high -= half
-                elif low >= qtr_3 and high < qtr_1:
-                    print("FFF")
-                    bits_F += 1
-                    low -= qtr_1
-                    high -= qtr_1
-                else:
-                    break
-                low += low
-                high += high + 1
-
-            low_last = int(low)
-            high_last = int(high)
-            print("Lo "+ str(low_last))
-            print("Hi "+ str(high_last))
-
-'''
-
+        print(symbol)
+        low = int(low_last + table_ranges[symbol][0] * (high_last - low_last + 1) / delitel)
+        high = int(low_last + table_ranges[symbol][1] * (high_last - low_last + 1) / delitel - 1)
+        while True:
+            if high < half:
+                bits_plus_follow(bits_to_write, bits_F, 0)
+            elif low >= half:
+                bits_plus_follow(bits_to_write, bits_F, 1)
+                low -= half
+                high -= half
+            elif low >= qtr_3 and high < qtr_1:
+                bits_F += 1
+                low -= qtr_1
+                high -= qtr_1
+            else:
+                break
+            low += low
+            high += high + 1
+            
+        low_last = int(low)
+        high_last = int(high)
+        
+def bits_plus_follow(bits_to_write, bits_F, bit):
+    bits_to_write.append(bit)
+    for i in range(bits_F):
+        bits_to_write.append(1 - bit)
 comp = "compressed.txt"
 data = "КОВ.КОРОВА"
 compress(data, comp)
