@@ -2,10 +2,21 @@ from bitarray import bitarray
 from collections import Counter, OrderedDict
 
 
-def bits_plus_follow(bits_to_write, bits_F, bit):
-    bits_to_write.append(bit)
-    for i in range(bits_F):
-        bits_to_write.append(1 - bit)
+# Функция для подсчета количества вхождений каждого символа в тексте
+def get_count_chars(text):
+	chars_count = dict()
+	for ch in text:
+		chars_count[ch] = chars_count.get(ch, 0) + 1
+	return chars_count
+
+#Сжатие файла
+def encode_file(input_file_path, encode_file_path):
+    f = open(input_file_path, 'rb') #Открытие файла с исходным файлом
+    text = f.read() #Считывание текста
+    f.close()
+    f = open(encode_file, 'wb')
+    
+
 
 def compress(data, compressed_file):
     # Подсчет частоты символов
@@ -57,12 +68,13 @@ def compress(data, compressed_file):
             
         low_last = int(low)
         high_last = int(high)
-    print(bits_to_write)
-    with open('output.txt', 'w') as file:
+        
+    count_chars = len(data)#Подсчет количества элементов в тексте
+    
+    with open(compressed_file, 'wb') as file:
     # Записываем каждый элемент массива в файл
         for element in bits_to_write:
-            print(element)
-            file.write(str(element) + '\n')
+            file.write(str(element))
 
     with open(compressed_file, 'wb') as file:
         
@@ -72,9 +84,22 @@ def compress(data, compressed_file):
             file.write(char_bytes)
             file.write(value.to_bytes(4, byteorder='big'))  # Записываем частоту символа в 4 байта
 
+
+def decompress(compressed_file, decompressed_file):
+    
+    pass    
 # Пример использования
-data = "КОВ.КОРОВА"
-compress(data, "compressed_file.txt")
+
+print(get_count_chars("КОВ.КОРОВА"))
+#Функция записи текста в файл
+
+input_file = "input.txt"
+compressed_file = "compressed.txt"
+
+with open(input_file, 'r', encoding='utf-8') as file:
+    text = file.read()
+
+compress(text, compressed_file)
 
 quit()
 print("Compressed Data:", compress(data))
