@@ -13,7 +13,6 @@ def encode(input_file, encode_file):
     freq = dict(Counter(data))
     
     sorted_freq = dict(sorted(freq.items(), key=lambda x: (x[1], x[0]), reverse=True))
-    print(sorted_freq)
     #Создание таблицы диапазонов символов
     low = 0
     table_ranges = {}
@@ -32,27 +31,22 @@ def encode(input_file, encode_file):
     qtr_1 = int((high_last + 1) / 4)
     half = qtr_1 * 2
     qtr_3 = qtr_1 * 3
-    value = []
+    result = []
     delitel = list(table_ranges.values())[-1][1]
     bits_F = 0
     
     for symbol in data:
         low = int(low_last + table_ranges[symbol][0] * (high_last - low_last + 1) / delitel)
         high = int(low_last + table_ranges[symbol][1] * (high_last - low_last + 1) / delitel - 1)
-        print(low)
-        print(high)
-        print()
+
         while True:
             if high < half:
-                print("YES")
-                bits_plus_follow(value, bits_F, 0)
+                bits_plus_follow(result, bits_F, 0)
             elif low >= half:
-                print("NO")
-                bits_plus_follow(value, bits_F, 1)
+                bits_plus_follow(result, bits_F, 1)
                 low -= half
                 high -= half
             elif low >= qtr_3 and high < qtr_1:
-                print("S")
                 bits_F += 1
                 low -= qtr_1
                 high -= qtr_1
@@ -63,11 +57,23 @@ def encode(input_file, encode_file):
             
         low_last = int(low)
         high_last = int(high)
-        print("Lo "+ str(low_last))
-        print("Hi "+ str(high_last))
-        print()
-    print(value)
-    print(table_ranges)
+        
+    result = int(''.join(map(str, result)), 2)
+    result = result.to_bytes(4, byteorder='big')
+    
+    count_chars = len(data)#Подсчет количества элементов в тексте
+    count_chars = count_chars.to_bytes(2, byteorder='big')
+    #Запись в файл
+    with open(encode_file, 'wb') as file:
+        #Запись частот символов и словарь символов
+        file.write(result)
+        file.write(count_chars)
+        
+        for char, code in sorted_freq.items():
+            char_bytes = char.encode('utf-8')
+            file.write(len(char_bytes).to_bytes(1, byteorder='big'))
+            file.write(char_bytes)
+            file.write(value.to_bytes(4, byteorder='big'))  # Записываем частоту символа в 4 байта
 
 def decode(encode_file, decode_file):
     '''
