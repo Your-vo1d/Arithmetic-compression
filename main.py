@@ -7,7 +7,8 @@ def bits_plus_follow(bits_to_write, bits_F, bit):
         bits_to_write.append(1 - bit)
 
 def encode(input_file, encode_file):
-    data = "КОВ.КОРОВА"
+    with open(input_file, 'r', encoding='utf-8') as file:
+        data = file.read()
     
     # Подсчет частоты символов
     freq = dict(Counter(data))
@@ -59,9 +60,11 @@ def encode(input_file, encode_file):
         high_last = int(high)
         
     result = int(''.join(map(str, result)), 2)
+    print(result)
     result = result.to_bytes(4, byteorder='big')
     
     count_chars = len(data)#Подсчет количества элементов в тексте
+    print(count_chars)
     count_chars = count_chars.to_bytes(2, byteorder='big')
     #Запись в файл
     with open(encode_file, 'wb') as file:
@@ -73,12 +76,32 @@ def encode(input_file, encode_file):
             char_bytes = char.encode('utf-8')
             file.write(len(char_bytes).to_bytes(1, byteorder='big'))
             file.write(char_bytes)
-            file.write(value.to_bytes(4, byteorder='big'))  # Записываем частоту символа в 4 байта
+            file.write(code.to_bytes(4, byteorder='big'))  # Записываем частоту символа в 4 байта
+
 
 def decode(encode_file, decode_file):
-    '''
-    '''
+    with open(encode_file, 'rb') as file:
+        result = file.read(4)
+        count_chars = file.read(2)
+        result = int.from_bytes(result,byteorder="big")
+        count_chars = int.from_bytes(count_chars, byteorder="big")
+        
+        sorted_freq = {}
+        while True:
+            char_len = file.read(1)
+            if not char_len:
+                break
+            char_len = int.from_bytes(char_len, byteorder='big')
+            char = file.read(char_len).decode('utf-8')
+            
+            freq_bytes = file.read(4)
+            freq = int.from_bytes(freq_bytes, byteorder='big')
+            
+            sorted_freq[char] = freq
     
-comp = "compressed.txt"
-data = "КОВ.КОРОВА"
-encode(data, comp)
+    
+input_file = "input.txt"
+encode_file = "encode.txt"
+decode_file = "decode.file"
+encode(input_file, encode_file)
+decode(encode_file, decode_file)
