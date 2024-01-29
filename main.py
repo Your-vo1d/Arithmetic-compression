@@ -197,5 +197,4 @@ encode_file = "encode.txt"
 decode_file = "decode.txt"
 encode(input_file, encode_file)
 decode(encode_file, decode_file)
-encode("test.txt", "result_encode.txt")
 decode("result_encode.txt", "result_test.txt")
