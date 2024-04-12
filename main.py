@@ -190,6 +190,9 @@ if __name__ == "__main__":
     if not os.path.exists(input_file):
         print(f"The file '{input_file}' does not exist in the current directory.")
         exit()
+        # Create a directory named "result" if it doesn't exist
+    if not os.path.exists("result"):
+        os.makedirs("result")
     encode_file = os.path.join("result", "encode.txt")
     decode_file = os.path.join("result", "decode.txt")
     encode(input_file, encode_file)
