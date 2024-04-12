@@ -1,4 +1,5 @@
 from collections import Counter
+import os
 
 # Writing the specified bit and previously deferred bits
 def bits_plus_follow(bits_to_write, bits_F, bit):
@@ -9,6 +10,7 @@ def bits_plus_follow(bits_to_write, bits_F, bit):
 
 # Encoding the file
 def encode(input_file, encode_file):
+
     # Reading text from the file
     with open(input_file, "r", encoding="utf-8") as file:
         data = file.read()
@@ -184,9 +186,12 @@ def decode(encode_file, decode_file):
         file.write(res)
 
 if __name__ == "__main__":
-    input_file = "input.txt"
-    encode_file = "encode.txt"
-    decode_file = "decode.txt"
+    input_file = input("Enter the name of the file to encode: ")
+    if not os.path.exists(input_file):
+        print(f"The file '{input_file}' does not exist in the current directory.")
+        exit()
+    encode_file = os.path.join("result", "encode.txt")
+    decode_file = os.path.join("result", "decode.txt")
     encode(input_file, encode_file)
     decode(encode_file, decode_file)
-    decode("result_encode.txt", "result_test.txt")
+    print("Encoding and decoding completed successfully.")
